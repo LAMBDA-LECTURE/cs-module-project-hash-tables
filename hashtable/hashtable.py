@@ -22,6 +22,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = capacity
+        self.storage = [None] * capacity
+        self.size = 0
 
 
     def get_num_slots(self):
@@ -35,6 +38,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -54,7 +58,21 @@ class HashTable:
         """
 
         # Your code here
+        # algorithm fnv-1 :
+        #     hash := FNV_offset_basis
+        #     for each byte_of_data to be hashed do
+        #         hash := hash × FNV_prime
+        #         hash := hash XOR byte_of_data
+            # return hash
+        FNV_prime = 1099511628211
+        FNV_offset = 14695981039346656037
 
+        hash = FNV_offset
+        for char in key:
+            hash = hash * FNV_prime
+            hash = hash ^ ord(char)
+
+        return hash
 
     def djb2(self, key):
         """
@@ -70,8 +88,8 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+        # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
@@ -82,7 +100,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        index = self.hash_index(key)
+        self.storage[index] = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -93,6 +112,12 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        if not self.storage[index]:
+            print("no key found")
+            return
+
+        self.storage[index] = None
 
 
     def get(self, key):
@@ -104,7 +129,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        if not self.storage[index]:
+            return None
 
+        return self.storage[index].value
 
     def resize(self, new_capacity):
         """
