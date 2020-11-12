@@ -2,6 +2,7 @@ class HashTableEntry:
     """
     Linked List hash table key/value pair
     """
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -26,7 +27,6 @@ class HashTable:
         self.storage = [None] * capacity
         self.size = 0
 
-
     def get_num_slots(self):
         """
         Return the length of the list you're using to hold the hash
@@ -40,15 +40,15 @@ class HashTable:
         # Your code here
         return self.capacity
 
-
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
-
+        ratio of items in the list vs how many spaces are in the list
+            filled:potential capacity
         Implement this.
         """
         # Your code here
-
+        return self.size / self.capacity
 
     def fnv1(self, key):
         """
@@ -82,7 +82,6 @@ class HashTable:
         """
         # Your code here
 
-
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
@@ -99,9 +98,31 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # # Your code here
+        # index = self.hash_index(key)
+        # self.storage[index] = HashTableEntry(key, value)
         index = self.hash_index(key)
-        self.storage[index] = HashTableEntry(key, value)
+        node = HashTableEntry(key, value)
+        if self.storage[index] is not None:
+            if self.storage[index].key == key:  # this and next 2 lines removable?
+                self.storage[index].value = value
+            else:
+                current = self.storage[index]
+                while current.next is not None:
+                    if current.key == key:
+                        current.value = value
+                    else:
+                        current = current.next
+                if current.key == key:
+                    current.value = value
+                else:
+                    current.next = node
+        else:
+            # when the index is none
+            self.storage[index] = node
+            self.size += 1
+        if self.get_load_factor() >= .7:
+            self.resize((self.capacity * 2))
 
     def delete(self, key):
         """
@@ -112,28 +133,58 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # index = self.hash_index(key)
+        # if not self.storage[index]:
+        #     print("no key found")
+        #     return
+
+        # self.storage[index] = None
+
         index = self.hash_index(key)
-        if not self.storage[index]:
-            print("no key found")
-            return
-
-        self.storage[index] = None
-
+        if self.storage[index] is None:
+            return None
+        elif self.storage[index].key == key: #possibly remove 145 - 153(until while loop) by including the head
+            self.size -= 1
+            if self.storage[index].next is not None:
+                self.storage[index] = self.storage[index].next
+            else:
+                self.storage[index] = None
+        else:
+            prev = self.storage[index]
+            current = self.storage[index].next
+            while current is not None: # meat of it all
+                if current.key == key:
+                    prev.next = current.next
+                    current.next = None
+                    self.size -= 1
+                else:
+                    prev = current
+                    current = current.next
+            return "Nothing to see here"
 
     def get(self, key):
         """
-        Retrieve the value stored with the given key.
-
+        Retrieve the value stored with the given key
         Returns None if the key is not found.
-
         Implement this.
         """
         # Your code here
-        index = self.hash_index(key)
-        if not self.storage[index]:
-            return None
+        # index = self.hash_index(key)
+        # if not self.storage[index]:
+        #     return None
 
-        return self.storage[index].value
+        # return self.storage[index].value
+
+        index = self.hash_index(key)
+        if self.storage[index] is None:
+            return None
+        current = self.storage[index]
+        while current is not None:
+            if current.key == key:
+                return current.value
+            else:
+                current = current.next
+        return None
 
     def resize(self, new_capacity):
         """
@@ -143,6 +194,12 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        old_storage = self.storage
+        self.capacity = new_capacity
+        self.storage = [None] * new_capacity
+        for node in old_storage:
+            if node is not None:
+                self.put(node.key, node.value)
 
 
 

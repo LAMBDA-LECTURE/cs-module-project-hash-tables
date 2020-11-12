@@ -1,7 +1,17 @@
 def word_count(s):
     # Your code here
-
-
+    dictionary = {}
+    s_list = s.split()
+    for word in s_list:
+        word = word.strip('":;,.-+=/\\|[]}{()*^&')
+        if word == '':
+            continue
+        word = word.lower()
+        if word not in dictionary:
+            dictionary[word] = 1
+        else:
+            dictionary[word] += 1
+    return dictionary
 
 if __name__ == "__main__":
     print(word_count(""))
