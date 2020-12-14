@@ -103,20 +103,30 @@ class HashTable:
         # self.storage[index] = HashTableEntry(key, value)
         index = self.hash_index(key)
         node = HashTableEntry(key, value)
+        #if there's something at that index:
         if self.storage[index] is not None:
+            #& it has the same key we're given
             if self.storage[index].key == key:  # this and next 2 lines removable?
+                #update the value
                 self.storage[index].value = value
             else:
+                #loop through the matching index's till we find the right value
                 current = self.storage[index]
                 while current.next is not None:
                     if current.key == key:
+                        #& update that value
                         current.value = value
                     else:
+                        #or keep looking
                         current = current.next
+                #& if we reach the tail, which has no none, check it
                 if current.key == key:
                     current.value = value
+                #or add the value to this new node after the tail
                 else:
                     current.next = node
+                    self.size += 1
+        #else if there's no matching indexes, just add the new node
         else:
             # when the index is none
             self.storage[index] = node
@@ -142,19 +152,24 @@ class HashTable:
 
         index = self.hash_index(key)
         if self.storage[index] is None:
+            #print a warning here
             return None
+        #if the key matches at the first index
         elif self.storage[index].key == key: #possibly remove 145 - 153(until while loop) by including the head
             self.size -= 1
+            #connect to the one after it if needed or just remove it
             if self.storage[index].next is not None:
                 self.storage[index] = self.storage[index].next
             else:
                 self.storage[index] = None
+        #if there's multiple matching indexes
         else:
             prev = self.storage[index]
             current = self.storage[index].next
             while current is not None: # meat of it all
                 if current.key == key:
                     prev.next = current.next
+                    #do we actually need this next line??? I can't figure out why
                     current.next = None
                     self.size -= 1
                 else:
