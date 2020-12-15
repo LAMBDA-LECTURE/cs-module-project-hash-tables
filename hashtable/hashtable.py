@@ -170,7 +170,7 @@ class HashTable:
                 if current.key == key:
                     prev.next = current.next
                     #do we actually need this next line??? I can't figure out why
-                    current.next = None
+                    # current.next = None
                     self.size -= 1
                 else:
                     prev = current
